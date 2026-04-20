@@ -400,7 +400,8 @@ class SwitchToNextModelAction extends Action2 {
 
 	override run(accessor: ServicesAccessor, ...args: unknown[]): void {
 		const widgetService = accessor.get(IChatWidgetService);
-		const widget = widgetService.lastFocusedWidget;
+		const context = args[0] as IChatExecuteActionContext | undefined;
+		const widget = context?.widget ?? widgetService.lastFocusedWidget;
 		widget?.input.switchToNextModel();
 	}
 }
@@ -701,7 +702,8 @@ export class ChatSessionPrimaryPickerAction extends Action2 {
 
 	override async run(accessor: ServicesAccessor, ...args: unknown[]): Promise<void> {
 		const widgetService = accessor.get(IChatWidgetService);
-		const widget = widgetService.lastFocusedWidget;
+		const context = args[0] as IChatExecuteActionContext | undefined;
+		const widget = context?.widget ?? widgetService.lastFocusedWidget;
 		if (widget) {
 			widget.input.openChatSessionPicker();
 		}

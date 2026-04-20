@@ -50,12 +50,17 @@ export interface IChatExecuteActionContext {
 	voice?: IVoiceChatExecuteActionContext;
 }
 
+function getWidgetFromExecuteContext(widgetService: IChatWidgetService, args: unknown[]): IChatWidget | undefined {
+	const context = args[0] as IChatExecuteActionContext | undefined;
+	return context?.widget ?? widgetService.lastFocusedWidget;
+}
+
 abstract class SubmitAction extends Action2 {
 	async run(accessor: ServicesAccessor, ...args: unknown[]) {
-		const context = args[0] as IChatExecuteActionContext | undefined;
 		const telemetryService = accessor.get(ITelemetryService);
 		const widgetService = accessor.get(IChatWidgetService);
-		const widget = context?.widget ?? widgetService.lastFocusedWidget;
+		const context = args[0] as IChatExecuteActionContext | undefined;
+		const widget = getWidgetFromExecuteContext(widgetService, args);
 
 		// Check if there's a pending delegation target
 		const pendingDelegationTarget = widget?.input.pendingDelegationTarget;
@@ -446,7 +451,7 @@ export class OpenModelPickerAction extends Action2 {
 
 	override async run(accessor: ServicesAccessor, ...args: unknown[]): Promise<void> {
 		const widgetService = accessor.get(IChatWidgetService);
-		const widget = widgetService.lastFocusedWidget;
+		const widget = getWidgetFromExecuteContext(widgetService, args);
 		if (widget) {
 			await widgetService.reveal(widget);
 			widget.input.openModelPicker();
@@ -484,9 +489,9 @@ export class OpenPermissionPickerAction extends Action2 {
 		});
 	}
 
-	override async run(accessor: ServicesAccessor): Promise<void> {
+	override async run(accessor: ServicesAccessor, ...args: unknown[]): Promise<void> {
 		const widgetService = accessor.get(IChatWidgetService);
-		const widget = widgetService.lastFocusedWidget;
+		const widget = getWidgetFromExecuteContext(widgetService, args);
 		if (widget) {
 			widget.input.openPermissionPicker();
 		}
@@ -535,7 +540,7 @@ export class OpenModePickerAction extends Action2 {
 
 	override async run(accessor: ServicesAccessor, ...args: unknown[]): Promise<void> {
 		const widgetService = accessor.get(IChatWidgetService);
-		const widget = widgetService.lastFocusedWidget;
+		const widget = getWidgetFromExecuteContext(widgetService, args);
 		if (widget) {
 			widget.input.openModePicker();
 		}
@@ -582,7 +587,7 @@ export class OpenSessionTargetPickerAction extends Action2 {
 
 	override async run(accessor: ServicesAccessor, ...args: unknown[]): Promise<void> {
 		const widgetService = accessor.get(IChatWidgetService);
-		const widget = widgetService.lastFocusedWidget;
+		const widget = getWidgetFromExecuteContext(widgetService, args);
 		if (widget) {
 			widget.input.openSessionTargetPicker();
 		}
@@ -618,7 +623,7 @@ export class OpenDelegationPickerAction extends Action2 {
 
 	override async run(accessor: ServicesAccessor, ...args: unknown[]): Promise<void> {
 		const widgetService = accessor.get(IChatWidgetService);
-		const widget = widgetService.lastFocusedWidget;
+		const widget = getWidgetFromExecuteContext(widgetService, args);
 		if (widget) {
 			widget.input.openDelegationPicker();
 		}
